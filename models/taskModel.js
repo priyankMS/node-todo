@@ -27,6 +27,7 @@ const getItemById = (id, callback) => {
       callback(null, row); 
     }
   });
+    console.log("done");
 };
 
 
