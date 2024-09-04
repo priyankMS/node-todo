@@ -1,0 +1,17 @@
+{
+  "name": "practice1",
+  "version": "1.0.0",
+  "description": "crudDemo\\",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "dependencies": {
+    "nodemon": "^3.1.4",
+    "sqlite3": "^5.1.7"
+  }
+}
