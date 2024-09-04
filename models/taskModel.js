@@ -18,5 +18,17 @@ const getAllTasks = (callback) => {
   });
 };
 
-module.exports = { addTask, getAllTasks };
-    
+const getItemById = (id, callback) => {
+  const sql = `SELECT * FROM task WHERE id = ?`;
+  db.get(sql, [id], (err, row) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, row); 
+    }
+  });
+};
+
+
+
+module.exports = { addTask, getAllTasks ,getItemById};

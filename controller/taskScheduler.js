@@ -1,4 +1,4 @@
-const { getAllTasks, addTask } = require("../models/taskModel");
+const { getAllTasks, addTask,getItemById } = require("../models/taskModel");
 
 const createTask = (req, res) => {
   let body = "";
@@ -35,4 +35,20 @@ const getTask = (req, res) => {
   });
 };
 
-module.exports = { getTask, createTask };
+const getTaskById = (req, res, id) => {
+  getItemById(id, (err, task) => {
+    if (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Failed to retrieve task" }));
+    } else if (!task) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "id not found " }));
+    } else {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(task));
+    }
+  });
+};
+
+
+module.exports = { getTask, createTask ,getTaskById };

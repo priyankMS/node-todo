@@ -1,14 +1,27 @@
-const url = require("url"); // Corrected 'uri' to 'url'
-const { getTask, createTask } = require("../controller/taskScheduler");
+const url = require("url");
+const {
+  getTask,
+  createTask,
+  getTaskById,
+} = require("../controller/taskScheduler");
 
 const TaskRoute = (req, res) => {
-    const parsedUrl = url.parse(req.url, true); 
-    
-    
-  if (req.method === "POST" && parsedUrl.pathname === "/addtask") {
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+ console.log(pathname);
+  if (req.method === "POST" && pathname === "/addtask") {
     createTask(req, res);
-  } else if (req.method === "GET" && parsedUrl.pathname === "/gettask") {
+  } else if (req.method === "GET" && pathname === "/gettask") {
     getTask(req, res);
+  } else if (req.method === "GET" && pathname.startsWith("/gettask/")) {
+    const id = pathname.split("/")[2]; // Extracting the id from the URL
+    if (id) {
+      console.log(id);
+      getTaskById(req, res, id);
+    } else {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Invalid ID" }));
+    }
   } else {
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: "Route not found" }));
@@ -16,4 +29,3 @@ const TaskRoute = (req, res) => {
 };
 
 module.exports = TaskRoute;
-
