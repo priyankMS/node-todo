@@ -59,10 +59,28 @@ const deleteTask = (id, callback) => {
   });
 };
 
+const upadateSomeTask = (id, title, description, callback, req, res) => {
+  const sql = `UPDATE task
+               SET title = COALESCE(?, title), 
+                   description = COALESCE(?, description)
+               WHERE id = ?;
+               `;
+  db.run(sql, [title || null, description || null, id], function (err) {
+    if (err) {
+      return callback(err)
+    }
+    if (this.changes === 0) { 
+      return callback(null, null); // Indicating no row was updated
+    }
+    callback(null, { id, title, description });
+  })
+};
+
 module.exports = {
   addTask,
   getAllTasks,
   getItemById,
   updateTask,
   deleteTask,
+  upadateSomeTask
 };

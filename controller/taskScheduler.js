@@ -4,6 +4,7 @@ const {
   getItemById,
   updateTask,
   deleteTask,
+  upadateSomeTask
 } = require("../models/taskModel");
 
 const createTask = (req, res) => {
@@ -15,6 +16,7 @@ const createTask = (req, res) => {
   req.on("end", () => {
     const { title, description } = JSON.parse(body);
     addTask(title, description, (err, task) => {
+
       // Ensure callback is passed here
       if (err) {
         res.writeHead(500, { "Content-Type": "application/json" });
@@ -81,6 +83,31 @@ const upadateData = (req, res, id) => {
   });
 };
 
+
+const upadateSomeData = (req, res,id) => {
+  let body = "";
+  req.on("data", (chunk) => {
+    body += chunk.toString()
+  });
+  req.on("end", () => {
+    const { title, description } = JSON.parse(body);
+    
+    upadateSomeTask(id, title, description, (err, task) => {
+      if (err) {
+        console.log(err);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ message: "Failed to retrieve task" }));
+      } else if (!task) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ message: "ID not found" }));
+      } else {
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(task));
+      }
+    })
+  })
+}
+
 const deleteData = (req, res) => {
   const id = req.url.split("/")[2];
   deleteTask(id, (err, data) => {
@@ -103,4 +130,5 @@ module.exports = {
   getTaskById,
   upadateData,
   deleteData,
+  upadateSomeData
 };
