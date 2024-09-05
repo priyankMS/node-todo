@@ -24,26 +24,45 @@ const getItemById = (id, callback) => {
     if (err) {
       callback(err, null);
     } else {
-      callback(null, row); 
+      callback(null, row);
     }
   });
-    console.log("done");
+  console.log("done");
 };
 
-const updateTask = (id, title, description, callback,req,res) => {
+const updateTask = (id, title, description, callback, req, res) => {
+  console.log(id, description, title);
   const sql = `UPDATE task SET title = ?, description = ? WHERE id = ?`;
-  db.run(sql, [id, req.title, req.description], (err, rows) => {
+  db.run(sql, [title, description, id], function (err) {
     if (err) {
-      err.stack;
-      callback(err, rows);
-    } else {
-       callback(null, { id, title, description });
+      // Return the error in the callback
+      return callback(err);
     }
 
-  })
+    if (this.changes === 0) {
+      return callback(null, null); // Indicating no row was updated
+    }
 
-}
+    // Success case
+    callback(null, { id, title, description });
+  });
+};
+const deleteTask = (id, callback) => {
+  const sql = `DELETE FROM task WHERE id = ?`;
 
+  db.run(sql, [id], (err) => {
+    if (err) {
+      return callback(err); // If there's an error, pass it to the callback
+    }
 
+    callback(null, id); // If successful, pass null for the error and return the deleted task's id
+  });
+};
 
-module.exports = { addTask, getAllTasks ,getItemById,updateTask};
+module.exports = {
+  addTask,
+  getAllTasks,
+  getItemById,
+  updateTask,
+  deleteTask,
+};
