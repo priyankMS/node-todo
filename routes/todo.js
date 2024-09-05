@@ -3,6 +3,7 @@ const {
   getTask,
   createTask,
   getTaskById,
+  upadateData
 } = require("../controller/taskScheduler");
 
 const TaskRoute = (req, res) => {
@@ -22,7 +23,21 @@ const TaskRoute = (req, res) => {
       res.writeHead(400, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ message: "Invalid ID" }));
     }
-  } else {
+  }
+    
+    else if (req.method === "PUT" && pathname === "updateTask") {
+    const id = pathname.split("/")[2]
+    if (!id) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({message:"Invalid ID"}))
+    }
+    else{
+      console.log("update id",id);
+       upadateData()
+    }
+    }
+
+  else {
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: "Route not found" }));
   }

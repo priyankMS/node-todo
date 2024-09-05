@@ -30,6 +30,20 @@ const getItemById = (id, callback) => {
     console.log("done");
 };
 
+const updateTask = (id, title, description, callback,req,res) => {
+  const sql = `UPDATE task SET title = ?, description = ? WHERE id = ?`;
+  db.run(sql, [id, req.title, req.description], (err, rows) => {
+    if (err) {
+      err.stack;
+      callback(err, rows);
+    } else {
+       callback(null, { id, title, description });
+    }
+
+  })
+
+}
 
 
-module.exports = { addTask, getAllTasks ,getItemById};
+
+module.exports = { addTask, getAllTasks ,getItemById,updateTask};
