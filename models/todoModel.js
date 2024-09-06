@@ -30,23 +30,7 @@ const getItemById = (id, callback) => {
   console.log("done");
 };
 
-const updateTask = (id, title, description, callback, req, res) => {
-  console.log(id, description, title);
-  const sql = `UPDATE task SET title = ?, description = ? WHERE id = ?`;
-  db.run(sql, [title, description, id], function (err) {
-    if (err) {
-      // Return the error in the callback
-      return callback(err);
-    }
 
-    if (this.changes === 0) {
-      return callback(null, null); // Indicating no row was updated
-    }
-
-    // Success case
-    callback(null, { id, title, description });
-  });
-};
 const deleteTask = (id, callback) => {
   const sql = `DELETE FROM task WHERE id = ?`;
 
@@ -67,20 +51,23 @@ const upadateSomeTask = (id, title, description, callback, req, res) => {
                `;
   db.run(sql, [title || null, description || null, id], function (err) {
     if (err) {
-      return callback(err)
+      console.log("this is call");
+      return callback(err);
     }
-    if (this.changes === 0) { 
+    if (this.changes === 0) {
+      console.log("changes call");
       return callback(null, null); // Indicating no row was updated
     }
+    console.log("3rd call");
     callback(null, { id, title, description });
-  })
+  });
 };
 
 module.exports = {
   addTask,
   getAllTasks,
   getItemById,
-  updateTask,
+
   deleteTask,
-  upadateSomeTask
+  upadateSomeTask,
 };

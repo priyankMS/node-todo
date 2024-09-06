@@ -3,18 +3,29 @@ const {
   getTask,
   createTask,
   getTaskById,
-  upadateData,
+
   deleteData,
   upadateSomeData,
-} = require("../controller/taskScheduler");
+} = require("../controller/todoController");
+
+const {
+  checkPostDataMiddleware,
+  updateDataMiddlerware,
+} = require("../middleware/todoMiddleware");
 
 const TaskRoute = (req, res) => {
+  console.log("req", req.method);
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
   //POST DATA
   if (req.method === "POST" && pathname === "/addtask") {
-    createTask(req, res);
+    console.log("this is call");
+    checkPostDataMiddleware(req, res, () => {
+      console.log("Middleware validation passed, calling createTask");
+
+      createTask(req, res);
+    });
 
     //GET DATA
   } else if (req.method === "GET" && pathname === "/gettask") {
@@ -31,26 +42,22 @@ const TaskRoute = (req, res) => {
 
     //UPADATE DATA
   } else if (req.method === "PUT" && pathname.startsWith("/updateTask")) {
+    
+    
     const id = pathname.split("/")[2];
-
+    console.log(typeof id);
     if (!id) {
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid ID" }));
-    } else {
-      console.log("update id", id);
-      upadateData(req, res, id);
-    }
-
-    //PATCH THIS REQUEST
-  } else if (req.method === "PATCH" && pathname.startsWith("/minorUpdate")) {
-    const id = pathname.split("/")[2];
-
-    if (!id) {
+      res.end(JSON.stringify({ message: "please enter id" }));
+    } else if ( id < 0) {
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid ID" }));
+      res.end(JSON.stringify({ message: "please enter valid id" }));
     } else {
       console.log("update id", id);
-      upadateSomeData(req, res, id);
+      updateDataMiddlerware(req, res, () => {
+        console.log("call this middleware ");
+        upadateSomeData(req, res, id);
+      });
     }
 
     //DELETE DATA

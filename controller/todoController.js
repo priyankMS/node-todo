@@ -2,30 +2,27 @@ const {
   getAllTasks,
   addTask,
   getItemById,
-  updateTask,
   deleteTask,
   upadateSomeTask
-} = require("../models/taskModel");
+} = require("../models/todoModel");
+const {STATUS_CODE} =  require('../config/constant')
 
 const createTask = (req, res) => {
-  let body = "";
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
+  // Use the parsed body from middleware
+  const { title, description } = req.body;
 
-  req.on("end", () => {
-    const { title, description } = JSON.parse(body);
-    addTask(title, description, (err, task) => {
 
-      // Ensure callback is passed here
-      if (err) {
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ message: "Failed to add task" }));
-      } else {
-        res.writeHead(201, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(task));
-      }
-    });
+
+  addTask(title, description, (err, task) => {
+    if (err) {
+      console.error("Error adding task:", err);
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Failed to add task" }));
+    } else {
+      console.log("Task added successfully:", task);
+      res.writeHead(201, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(task));
+    }
   });
 };
 
@@ -36,10 +33,18 @@ const getTask = (req, res) => {
       res.end(JSON.stringify({ message: "Failed to retrieve tasks" }));
     } else {
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(data));
+      res.end(
+        JSON.stringify({
+          status: STATUS_CODE.OK,
+          message: "Task retrieved successfully",
+          totalData:data.length,
+          data: data,
+        })
+      );
     }
   });
 };
+
 
 const getTaskById = (req, res, id) => {
   getItemById(id, (err, task) => {
@@ -51,48 +56,23 @@ const getTaskById = (req, res, id) => {
       res.end(JSON.stringify({ message: "id not found " }));
     } else {
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(task));
+      res.end(JSON.stringify({
+        status: STATUS_CODE.OK,
+        message: `Task retrieved successfully on this id:${id}`,
+        data: task
+      }));
     }
   });
 };
 
-const upadateData = (req, res, id) => {
-  let body = "";
-
-  // Collecting chunks of data
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  // Parsing data when the request ends
-  req.on("end", () => {
-    const { title, description } = JSON.parse(body);
-
-    updateTask(id, title, description, (err, task) => {
-      if (err) {
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ message: "Failed to retrieve task" }));
-      } else if (!task) {
-        res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ message: "ID not found" }));
-      } else {
-        res.writeHead(201, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(task));
-      }
-    });
-  });
-};
 
 
 const upadateSomeData = (req, res,id) => {
-  let body = "";
-  req.on("data", (chunk) => {
-    body += chunk.toString()
-  });
-  req.on("end", () => {
-    const { title, description } = JSON.parse(body);
+
+    const { title, description } = req.body;
     
     upadateSomeTask(id, title, description, (err, task) => {
+      console.log("task",task);
       if (err) {
         console.log(err);
         res.writeHead(500, { "Content-Type": "application/json" });
@@ -105,7 +85,7 @@ const upadateSomeData = (req, res,id) => {
         res.end(JSON.stringify(task));
       }
     })
-  })
+  
 }
 
 const deleteData = (req, res) => {
@@ -128,7 +108,7 @@ module.exports = {
   getTask,
   createTask,
   getTaskById,
-  upadateData,
+ 
   deleteData,
   upadateSomeData
 };
